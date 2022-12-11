@@ -56,7 +56,7 @@ public class CharacterResource implements ICharacterAttributes, ICharacters {
         return (wearsHat) ? "YES" : "NO";
     }
 
-    public CharacterResource getCharacterResourceByName(String characterName){
+    public CharacterResource getCharacterByName(String characterName){
         for ( CharacterResource character : ICharacters.characters){
             if (characterName.equals(character.characterName)){
                 return character;
@@ -104,6 +104,17 @@ public class CharacterResource implements ICharacterAttributes, ICharacters {
             }
         }
         return false;
+    }
+
+    public boolean checkCharacterAttribute(String attributeName, String attributeValue){
+        checkCharacterAttributeName();
+        checkCharacterAttributeValue();
+    }
+
+    public boolean checkCharacterAttributeName(String attributeName){
+        if ()
+    }
+    public boolean checkCharacterAttributeValue(String attributeValue){
     }
 
 
