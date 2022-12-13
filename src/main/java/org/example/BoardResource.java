@@ -71,49 +71,53 @@ public class BoardResource implements ICharacters {
 
     public String askPlayerForStringInputAndConvertFormat(){
         Scanner scanner = new Scanner(System.in);
-        // Takes the string inputted by the player, removes whitespaces,
-        // then uppercase the first letter and lowercase everything else
         String playerInput = scanner.nextLine().replaceAll("\\s", "");
-        playerInput = playerInput.substring(0,1).toUpperCase() + playerInput.substring(1).toLowerCase();
+        playerInput = playerInput.toLowerCase();
         return playerInput;
     }
 
-    public char askPlayerForCharacterInput(){
+    public int askPlayerForNumberInput(){
         Scanner scanner = new Scanner(System.in);
         String input = "";
-        while (input.length() != 1 ){
+        while ( !checkIfStringIsValid(input) ){
             input = scanner.nextLine();
         }
-        return input.charAt(0);
+        return Integer.parseInt(input);
     }
-    public int checkIfStringIsANumberFromOneToSeven(String character){
-        String allowedNumbers = "1234567";
-        if (allowedNumbers.contains(character)){
-            return Integer.parseInt(character);
+    public boolean checkIfStringIsValid(String selectionNumber){
+        // valid options are number 1-7
+        switch (selectionNumber){
+            case "1":
+            case "2":
+            case "3":
+            case "4":
+            case "5":
+            case "6":
+            case "7":
+                return true;
         }
-
+        System.out.println("You have entered an invalid value");
+        return false;
     }
 
     public void askPlayerForACharacterAttribute(int playerNumber){
         int characterAttributeNameID = askCharacterAttributeName();
-
+        System.out.println("fuckin worked " + characterAttributeNameID);
         String characterAttributeValue = askCharacterAttributeValue(characterAttributeNameID);
-        //TODO convert input of playerNumberInput to String
     }
 
     public int askCharacterAttributeName(){
-        char playerNumberInput = askPlayerForCharacterInput();
-        while (contains(playerNumberInput, allowedInputNumbers) ){
-            System.out.println("Please pick an attribute name based on its number from the list below:");
-            System.out.println("1. Name \t2. Hair Color \t3. T-shirt Color \t4. Eye Color" +
-                    "\t5. Glasses \t6. Smile \t 7. Hat");
-            playerNumberInput = askPlayerForNumberInput();
-        }
+        int playerNumberInput = 0;
+        System.out.println("Please pick an attribute name based on its number from the list below:");
+        System.out.println("1. Name \t2. Hair Color \t3. T-shirt Color \t4. Eye Color" +
+                "\t5. Glasses \t6. Smile \t 7. Hat");
+        playerNumberInput = askPlayerForNumberInput();
+
         return playerNumberInput;
     }
 
     public String askCharacterAttributeValue(int characterAttributeNameID){
-        String playerInput = null;
+        String playerInput = "";
         switch (characterAttributeNameID) {
             case 1:
                 while (!characterResource.checkName(playerInput)){
@@ -167,6 +171,7 @@ public class BoardResource implements ICharacters {
         while (!hasFirstPlayerChosenCorrectly || !hasSecondPlayerChosenCorrectly ){
             startNewTurnForPlayer(1);
             startNewTurnForPlayer(2);
+            // TODO
         }
     }
 

@@ -58,7 +58,8 @@ public class CharacterResource implements ICharacterAttributes, ICharacters {
 
     public CharacterResource getCharacterByName(String characterName){
         for ( CharacterResource character : ICharacters.characters){
-            if (characterName.equals(character.characterName)){
+            if (character.characterName.toLowerCase().equals(characterName)){
+
                 return character;
             }
         }
@@ -68,7 +69,7 @@ public class CharacterResource implements ICharacterAttributes, ICharacters {
 
     public boolean checkName(String characterName){
         for (String validCharacterName : validCharacterNames) {
-            if (validCharacterName.equals(characterName)){
+            if (validCharacterName.toLowerCase().equals(characterName)){
                 return true;
             }
         }
@@ -81,7 +82,8 @@ public class CharacterResource implements ICharacterAttributes, ICharacters {
 
     public boolean checkHairColor(String hairColor){
         for (String validHairColor : validHairColors) {
-            if (hairColor.equals(validHairColor)){
+            System.out.println(validHairColor.toLowerCase() + " " + hairColor);
+            if (validHairColor.toLowerCase().equals(hairColor)){
                 return true;
             }
         }
@@ -90,7 +92,7 @@ public class CharacterResource implements ICharacterAttributes, ICharacters {
 
     public boolean checkShirtColor(String shirtColor){
         for (String validShirtColor : validShirtColors) {
-            if (shirtColor.equals(validShirtColor)){
+            if (validShirtColor.toLowerCase().equals(shirtColor)){
                 return true;
             }
         }
@@ -99,7 +101,8 @@ public class CharacterResource implements ICharacterAttributes, ICharacters {
 
     public boolean checkEyeColor(String eyeColor){
         for (String validCEyeColor : validCEyeColors) {
-            if (eyeColor.equals(validCEyeColor)){
+            System.out.println(validCEyeColor.toLowerCase() + " " + eyeColor);
+            if (validCEyeColor.toLowerCase().equals(eyeColor)){
                 return true;
             }
         }
