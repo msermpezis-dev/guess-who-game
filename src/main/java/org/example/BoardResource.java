@@ -47,7 +47,7 @@ public class BoardResource implements ICharacters {
     public void makePlayersChooseCharacter(){
 
         int playerNumber = 1;
-        while (firstPlayerChosenCharacter == null || secondPlayerChosenCharacter == null){
+        while (playerNumber <=2){
             System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n");
             System.out.println("Player " + playerNumber + " please a character from the list below");
             printCharactersWithTheirAttributes(ICharacters.characters);
@@ -61,6 +61,7 @@ public class BoardResource implements ICharacters {
                 playerNumber++;
             } else if (isChosenCharacterNameValid && playerNumber == 2){
                 secondPlayerChosenCharacter = characterResource.getCharacterByName(playerChosenCharacter);
+                playerNumber++;
             }
             else {
                 System.out.println("A character with the name " + playerChosenCharacter + "doesn't exist");
@@ -77,20 +78,32 @@ public class BoardResource implements ICharacters {
         return playerInput;
     }
 
-    public int askPlayerForNumberInput(){
+    public char askPlayerForCharacterInput(){
         Scanner scanner = new Scanner(System.in);
-        return scanner.nextInt();
+        String input = "";
+        while (input.length() != 1 ){
+            input = scanner.nextLine();
+        }
+        return input.charAt(0);
+    }
+    public int checkIfStringIsANumberFromOneToSeven(String character){
+        String allowedNumbers = "1234567";
+        if (allowedNumbers.contains(character)){
+            return Integer.parseInt(character);
+        }
+
     }
 
     public void askPlayerForACharacterAttribute(int playerNumber){
         int characterAttributeNameID = askCharacterAttributeName();
-        String characterAttributeValue;askCharacterAttributeValue(characterAttributeNameID);
-        //TODO
+
+        String characterAttributeValue = askCharacterAttributeValue(characterAttributeNameID);
+        //TODO convert input of playerNumberInput to String
     }
 
     public int askCharacterAttributeName(){
-        int playerNumberInput = 0;
-        while (playerNumberInput <= 0 && playerNumberInput > 7 ){
+        char playerNumberInput = askPlayerForCharacterInput();
+        while (contains(playerNumberInput, allowedInputNumbers) ){
             System.out.println("Please pick an attribute name based on its number from the list below:");
             System.out.println("1. Name \t2. Hair Color \t3. T-shirt Color \t4. Eye Color" +
                     "\t5. Glasses \t6. Smile \t 7. Hat");

@@ -107,14 +107,16 @@ public class CharacterResource implements ICharacterAttributes, ICharacters {
     }
 
     public boolean checkCharacterAttribute(String attributeName, String attributeValue){
-        checkCharacterAttributeName();
-        checkCharacterAttributeValue();
+        checkCharacterAttributeName(attributeName);
+        checkCharacterAttributeValue(attributeValue);
+        return true;
     }
 
     public boolean checkCharacterAttributeName(String attributeName){
-        if ()
+        return true;
     }
     public boolean checkCharacterAttributeValue(String attributeValue){
+        return true;
     }
 
 
