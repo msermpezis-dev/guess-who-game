@@ -25,6 +25,16 @@ public class CharacterResource implements ICharacterAttributes, ICharacters {
         this.wearsHat = wearsHat;
     }
 
+    public CharacterResource(CharacterResource characterResource){
+        this.characterName = characterResource.getCharacterName();
+        this.hairColor = characterResource.getHairColor();
+        this.shirtColor = characterResource.getShirtColor();
+        this.eyeColor = characterResource.getEyeColor();
+        this.hasGlasses = characterResource.hasGlasses;
+        this.isSmiling = characterResource.isSmiling;
+        this.wearsHat = characterResource.wearsHat;
+    }
+
     public CharacterResource(){
     }
 
@@ -45,15 +55,15 @@ public class CharacterResource implements ICharacterAttributes, ICharacters {
     }
 
     public String doesCharacterHaveGlasses(){
-        return (hasGlasses) ? "YES" : "NO";
+        return (hasGlasses) ? "yes" : "no";
     }
 
     public String isCharacterSmiling(){
-        return (isSmiling) ? "YES" : "NO";
+        return (isSmiling) ? "yes" : "no";
     }
 
     public String isCharacterWearingAHat(){
-        return (wearsHat) ? "YES" : "NO";
+        return (wearsHat) ? "yes" : "no";
     }
 
     public CharacterResource getCharacterByName(String characterName){
@@ -78,6 +88,10 @@ public class CharacterResource implements ICharacterAttributes, ICharacters {
 
     public String isEliminated(){
         return (isEliminated) ? "YES" : "NO";
+    }
+
+    public void setEliminated(boolean isEliminated){
+        this.isEliminated = isEliminated;
     }
 
     public boolean checkHairColor(String hairColor){
