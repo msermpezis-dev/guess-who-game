@@ -1,6 +1,4 @@
-package org.example;
-
-import com.sun.xml.internal.ws.api.message.ExceptionHasMessage;
+package org.guesswhogame;
 
 public class CharacterResource implements ICharacterAttributes, ICharacters {
     private String characterName;
@@ -122,21 +120,4 @@ public class CharacterResource implements ICharacterAttributes, ICharacters {
         }
         return false;
     }
-
-    public boolean checkCharacterAttribute(String attributeName, String attributeValue){
-        checkCharacterAttributeName(attributeName);
-        checkCharacterAttributeValue(attributeValue);
-        return true;
-    }
-
-    public boolean checkCharacterAttributeName(String attributeName){
-        return true;
-    }
-    public boolean checkCharacterAttributeValue(String attributeValue){
-        return true;
-    }
-
-
-
-
 }

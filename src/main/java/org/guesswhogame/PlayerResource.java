@@ -1,4 +1,4 @@
-package org.example;
+package org.guesswhogame;
 
 /**
  * @author msermpezis-dev
@@ -6,11 +6,8 @@ package org.example;
  * @created 1:04 μ.μ. - 17/12/2022
  */
 public class PlayerResource {
-
-     private CharacterResource playerChosenCharacter;
-
+    private CharacterResource playerChosenCharacter;
     private boolean isPlayerCorrect;
-
     private boolean isItThisPlayersTurn;
 
     public PlayerResource(){
@@ -19,8 +16,7 @@ public class PlayerResource {
     }
 
     public void setChosenCharacterByName(String characterName){
-        this.playerChosenCharacter = new CharacterResource(
-                new CharacterResource().getCharacterByName(characterName));
+        this.playerChosenCharacter = new CharacterResource(new CharacterResource().getCharacterByName(characterName));
     }
 
     public CharacterResource getChosenCharacter(){
@@ -33,7 +29,6 @@ public class PlayerResource {
 
     public void setIsItThisPlayersTurn(boolean isItThisPlayersTurn){
         this.isItThisPlayersTurn = isItThisPlayersTurn;
-
     }
 
     public boolean getIsPlayerCorrect(){
