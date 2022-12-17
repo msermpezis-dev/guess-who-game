@@ -7,14 +7,10 @@ public class BoardResource implements ICharacters {
     private CharacterResource[] playerOneBoardCharacters = new CharacterResource[ICharacters.characters.length];
     private CharacterResource[] playerTwoBoardCharacters = new CharacterResource[ICharacters.characters.length];
     private final CharacterResource characterResource = new CharacterResource();
-    CharacterResource PlayerOneChosenCharacter;
-    CharacterResource PlayerTwoChosenCharacter;
+    private PlayerResource playerOne;
+    private PlayerResource playerTwo;
     private int turnCounter = 1;
-    private int currentPlayerID = 1;
-    boolean hasPlayerOneChosenCorrectly = false;
-    boolean hasPlayerTwoChosenCorrectly = false;
-    boolean hasAnyPlayerHasChosenCorrectly = false;
-    boolean restartGameChoice = false;
+    boolean isAnyPlayerCorrect = false;
 
     public BoardResource(){
         for (int i = 0; i <= ICharacters.characters.length - 1; i++){
@@ -23,10 +19,8 @@ public class BoardResource implements ICharacters {
         }
     }
     public void startGame(){
-        // TODO refine prints
-        // TODO maybe refine nested ifs
         makePlayersChooseCharacter();
-        while (!hasPlayerOneChosenCorrectly || !hasPlayerTwoChosenCorrectly  && !hasAnyPlayerHasChosenCorrectly){
+        while (!isAnyPlayerCorrect){
             startNewTurn();
             endCurrentPlayerTurn();
         }
@@ -34,18 +28,36 @@ public class BoardResource implements ICharacters {
     }
 
     public void startNewTurn(){
-        System.out.println("Turn " + turnCounter);
         showPlayerBoard();
         String[] characterAttribute = askForACharacterAttribute();
         checkCurrentPlayerAndEliminateCharacters(characterAttribute);
     }
 
-    private void checkCurrentPlayerAndEliminateCharacters(String[] characterAttribute) {
-        if (currentPlayerID == 1) {
-            eliminateCharactersWithoutInputAttributes(characterAttribute, playerOneBoardCharacters, PlayerTwoChosenCharacter);
+    public void endCurrentPlayerTurn(){
+        if (playerOne.getIsItThisPlayersTurn()) {
+            playerOne.setIsItThisPlayersTurn(false);
+            playerTwo.setIsItThisPlayersTurn(true);
+        } else if (playerTwo.getIsItThisPlayersTurn()) {
+            playerTwo.setIsItThisPlayersTurn(false);
+            playerOne.setIsItThisPlayersTurn(true);
         }
-        else if (currentPlayerID == 2) {
-            eliminateCharactersWithoutInputAttributes(characterAttribute, playerTwoBoardCharacters, PlayerOneChosenCharacter);
+        turnCounter++;
+    }
+
+    public void congratulateWinner(){
+        if (playerOne.getIsPlayerCorrect()){
+            System.out.println("CONGRATULATIONS PLAYER ONE! YOU HAVE CORRECTLY GUESSED YOUR OPPONENT'S CHARACTER");
+        } else if (playerTwo.getIsPlayerCorrect()) {
+            System.out.println("CONGRATULATIONS PLAYER TWO! YOU HAVE CORRECTLY GUESSED YOUR OPPONENT'S CHARACTER");
+        }
+    }
+
+    private void checkCurrentPlayerAndEliminateCharacters(String[] characterAttribute) {
+        if (playerOne.getIsItThisPlayersTurn()) {
+            eliminateCharactersWithoutInputAttributes(characterAttribute, playerOneBoardCharacters, playerTwo.getChosenCharacter());
+        }
+        else if (playerTwo.getIsItThisPlayersTurn()) {
+            eliminateCharactersWithoutInputAttributes(characterAttribute, playerTwoBoardCharacters, playerOne.getChosenCharacter());
         }
     }
 
@@ -53,7 +65,16 @@ public class BoardResource implements ICharacters {
                                                            CharacterResource[] playerBoardCharacters,
                                                            CharacterResource ChosenCharacter){
         // if questions has positive result
-        if ("hairColor".equals(characterAttribute[0]) &&
+        if ("characterName".equals(characterAttribute[0]) &&
+                ChosenCharacter.getCharacterName().toLowerCase().equals(characterAttribute[1])
+        ) {
+            for (CharacterResource character : playerBoardCharacters) {
+                if( "characterName".equals(characterAttribute[0]) &&
+                        !character.getCharacterName().toLowerCase().equals(characterAttribute[1])){
+                    character.setEliminated(true);
+                }
+            }
+        } else if ("hairColor".equals(characterAttribute[0]) &&
                 ChosenCharacter.getHairColor().toLowerCase().equals(characterAttribute[1])
         ) {
             for (CharacterResource character : playerBoardCharacters) {
@@ -111,7 +132,16 @@ public class BoardResource implements ICharacters {
 
         
         // if questions has negative result
-        if ("hairColor".equals(characterAttribute[0]) &&
+        if ("characterName".equals(characterAttribute[0]) &&
+                !ChosenCharacter.getCharacterName().toLowerCase().equals(characterAttribute[1])
+        ) {
+            for (CharacterResource character : playerBoardCharacters) {
+                if( "characterName".equals(characterAttribute[0]) &&
+                        character.getCharacterName().toLowerCase().equals(characterAttribute[1])){
+                    character.setEliminated(true);
+                }
+            }
+        } else if ("hairColor".equals(characterAttribute[0]) &&
                 !ChosenCharacter.getHairColor().toLowerCase().equals(characterAttribute[1])
         ) {
             for (CharacterResource character : playerBoardCharacters) {
@@ -169,54 +199,38 @@ public class BoardResource implements ICharacters {
         }
     }
 
-    public void endCurrentPlayerTurn(){
-        switch (currentPlayerID){
-            case 1:
-                currentPlayerID = 2;
-                break;
-            case 2:
-                currentPlayerID = 1;
-                break;
-            default:
-                System.out.println("Unexpected player ID");
-        }
-        turnCounter++;
-    }
-
-    public void congratulateWinner(){
-        if (hasPlayerOneChosenCorrectly){
-            System.out.println("CONGRATULATIONS PLAYER ONE! YOU HAVE CORRECTLY GUESSED YOUR OPPONENT'S CHARACTER");
-        } else if (hasPlayerTwoChosenCorrectly) {
-            System.out.println("CONGRATULATIONS PLAYER TWO! YOU HAVE CORRECTLY GUESSED YOUR OPPONENT'S CHARACTER");
-        }
-    }
 
     public void checkCurrentGuess(String characterNameGuess){
-        String playerOneCharacterName = PlayerOneChosenCharacter.getCharacterName().toLowerCase();
-        String playerTwoCharacterName = PlayerTwoChosenCharacter.getCharacterName().toLowerCase();
+        String playerOneCharacterName = playerOne.getChosenCharacter().getCharacterName().toLowerCase();
+        String playerTwoCharacterName = playerTwo.getChosenCharacter().getCharacterName().toLowerCase();
 
-        if (currentPlayerID == 1 && playerTwoCharacterName.equals(characterNameGuess)){
-            hasPlayerOneChosenCorrectly = true;
-            hasAnyPlayerHasChosenCorrectly = true;
-        } else if (currentPlayerID == 2 && playerOneCharacterName.equals(characterNameGuess)) {
-            hasPlayerOneChosenCorrectly = true;
-            hasAnyPlayerHasChosenCorrectly = true;
+        if (playerOne.getIsItThisPlayersTurn() && playerTwoCharacterName.equals(characterNameGuess)){
+            playerOne.setIsPlayerCorrect(true);
+            isAnyPlayerCorrect = true;
+        } else if (playerTwo.getIsItThisPlayersTurn() && playerOneCharacterName.equals(characterNameGuess)) {
+            playerTwo.setIsPlayerCorrect(true);
+            isAnyPlayerCorrect = true;
         }
     }
 
     public void showPlayerBoard(){
-        System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n");
-        System.out.println("Player " + currentPlayerID +"'s board characters:");
-        System.out.println("Eliminated\t|"  + " Character Attributes");
-        if (currentPlayerID == 1) {
-            printCharactersWithTheirAttributes(playerOneBoardCharacters);
+        System.out.println("\n\nTurn " + turnCounter);
+        if (playerOne.getIsItThisPlayersTurn()) {
+            System.out.println("Player One's remaining board characters:");
+            System.out.println("Eliminated\t|"  + " Character Attributes");
+            printRemainingCharacters(playerOneBoardCharacters);
         }
-        else if (currentPlayerID == 2){
-            printCharactersWithTheirAttributes(playerTwoBoardCharacters);
+        else if (playerTwo.getIsItThisPlayersTurn()){
+            System.out.println("Player Two's board characters:");
+            System.out.println("Eliminated\t|"  + " Character Attributes");
+            printRemainingCharacters(playerTwoBoardCharacters);
         }
     }
 
     public void printCharactersWithTheirAttributes(CharacterResource[] playerCharacters ){
+        System.out.printf("%-10s|\t %-11s| %-13s| %-11s| %-15s| %-15s| %-15s %n", "Name", "Hair Color",
+                "Shirt Color", "Eye Color", "hasGlasses", "isSmiling", "wearsHat");
+        System.out.println("------------------------------------------------------------------------------------------------");
         for ( CharacterResource character : playerCharacters ){
             String characterName = character.getCharacterName();
             String hairColor = character.getHairColor();
@@ -224,35 +238,60 @@ public class BoardResource implements ICharacters {
             String eyeColor = character.getEyeColor();
             String hasGlasses = character.doesCharacterHaveGlasses();
             String isSmiling = character.isCharacterSmiling();
-            String wearsHat = character.isCharacterWearingAHat();
-            String isEliminated = character.isEliminated();
-            String characterDescription = "\t\t\t| " + characterName + ": " + hairColor + " Hair, " + shirtColor
-                    + " Shirt, " + eyeColor + " Eyes, " + "hasGlasses : " + hasGlasses + ", " + "isSmiling : "
-                    + isSmiling + ", " + "wearsHat : " + wearsHat;
-            System.out.println(isEliminated + characterDescription);
+            String wearsHat =  character.isCharacterWearingAHat();
+            String characterDescription = "%-10s|\t %-11s| %-13s| %-11s| %-15s| %-15s| %-15s %n";
+            System.out.printf(characterDescription, characterName, hairColor, shirtColor, eyeColor, hasGlasses,
+                    isSmiling, wearsHat);
+        }
+    }
+
+    public void printRemainingCharacters(CharacterResource[] playerCharacters ){
+        System.out.printf("%-10s|\t %-11s| %-13s| %-11s| %-15s| %-15s| %-15s %n", "Name", "Hair Color",
+                "Shirt Color", "Eye Color", "hasGlasses", "isSmiling", "wearsHat");
+        System.out.println("------------------------------------------------------------------------------------------------");
+        for ( CharacterResource character : playerCharacters ){
+            String characterName = character.getCharacterName();
+            String hairColor = character.getHairColor();
+            String shirtColor = character.getShirtColor();
+            String eyeColor = character.getEyeColor();
+            String hasGlasses = character.doesCharacterHaveGlasses();
+            String isSmiling = character.isCharacterSmiling();
+            String wearsHat =  character.isCharacterWearingAHat();
+            String characterDescription = "%-10s|\t %-11s| %-13s| %-11s| %-15s| %-15s| %-15s %n";
+            if (!character.getIsEliminated()){
+                System.out.printf(characterDescription, characterName, hairColor, shirtColor, eyeColor, hasGlasses,
+                        isSmiling, wearsHat);
+            }
         }
     }
 
     public void makePlayersChooseCharacter(){
+        playerOne = new PlayerResource();
+        playerTwo = new PlayerResource();
+        System.out.println("Board with all available characters.");
+        printCharactersWithTheirAttributes(ICharacters.characters);
+        while (playerOne.getChosenCharacter() == null || playerTwo.getChosenCharacter() == null){
 
-        int playerNumber = 1;
-        while (playerNumber <= 2){
-            System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n");
-            printCharactersWithTheirAttributes(ICharacters.characters);
-            System.out.println("Player " + playerNumber + " please a character name from the list above");
+            if (!playerOne.getIsItThisPlayersTurn()){
+                System.out.println("\nPlayer One please a character name from the list above: ");
+            } else if (!playerTwo.getIsItThisPlayersTurn()) {
+                System.out.println("\nPlayer Two please a character name from the list above: ");
+            }
 
-            String playerChosenCharacter = askPlayerForStringInputAndConvertFormat();
-            boolean isChosenCharacterNameValid = characterResource.checkName(playerChosenCharacter);
+            String playerChosenCharacterName = askPlayerForStringInputAndConvertFormat();
+            boolean isChosenCharacterNameValid = characterResource.checkName(playerChosenCharacterName);
 
-            if (isChosenCharacterNameValid && playerNumber == 1){
-                PlayerOneChosenCharacter = characterResource.getCharacterByName(playerChosenCharacter);
-                playerNumber++;
-            } else if (isChosenCharacterNameValid && playerNumber == 2){
-                PlayerTwoChosenCharacter = characterResource.getCharacterByName(playerChosenCharacter);
-                playerNumber++;
+            if (isChosenCharacterNameValid && !playerOne.getIsItThisPlayersTurn()){
+                playerOne.setIsItThisPlayersTurn(true);
+                playerOne.setChosenCharacterByName(playerChosenCharacterName);
+                System.out.println("\n\n\n\n");
+                System.out.println("Board with all available characters.");
+                printCharactersWithTheirAttributes(ICharacters.characters);
+            } else if (isChosenCharacterNameValid && !playerTwo.getIsItThisPlayersTurn()){
+                playerTwo.setChosenCharacterByName(playerChosenCharacterName);
             }
             else {
-                System.out.println("A character with the name " + playerChosenCharacter + "doesn't exist");
+                System.out.println("A character with the name '" + playerChosenCharacterName + "' doesn't exist!");
             }
         }
     }
@@ -284,7 +323,7 @@ public class BoardResource implements ICharacters {
             case "7":
                 return true;
             default:
-                System.out.println("You have entered an invalid value");
+                System.out.println("You have entered an invalid option!");
                 return false;
         }
     }
@@ -292,13 +331,12 @@ public class BoardResource implements ICharacters {
     public String[] askForACharacterAttribute(){
         String characterAttributeName = askCharacterAttributeName();
         String characterAttributeValue = askCharacterAttributeValue(characterAttributeName);
-        String[] characterAttributeNameAndValue = {characterAttributeName, characterAttributeValue};
-        return characterAttributeNameAndValue;
+        return new String[]{characterAttributeName, characterAttributeValue};
     }
 
     public String askCharacterAttributeName(){
         int playerNumberInput;
-        System.out.println("Please pick an attribute name based on its number from the list below:");
+        System.out.println("Please pick the number that corresponds to the attribute name from the list below:");
         System.out.println("1. Name \t2. Hair Color \t3. T-shirt Color \t4. Eye Color" +
                 "\t5. Glasses \t6. Smile \t 7. Hat");
         playerNumberInput = askPlayerForNumberInput();
@@ -339,37 +377,40 @@ public class BoardResource implements ICharacters {
                 return playerInput;
             case "hairColor":
                 while (!characterResource.checkHairColor(playerInput)){
-                    System.out.println("Please select a Hair Color from your above board: ");
+                    System.out.println("Please select a Hair Color from the list below: ");
+                    System.out.println("Available Hair Colors: brown, blond, red, black");
                     playerInput = askPlayerForStringInputAndConvertFormat();
                 }
                 return playerInput;
             case "shirtColor":
                 while (!characterResource.checkShirtColor(playerInput)){
                     System.out.println("Please select a T-Shirt Color from your above board: ");
+                    System.out.println("Available Hair Colors: black, white, yellow, green");
                     playerInput = askPlayerForStringInputAndConvertFormat();
                 }
                 return playerInput;
             case "eyeColor":
                 while (!characterResource.checkEyeColor(playerInput)){
                     System.out.println("Please select an Eye Color from your above board: ");
+                    System.out.println("Available Hair Colors: brown, blue, green");
                     playerInput = askPlayerForStringInputAndConvertFormat();
                 }
                 return playerInput;
             case "hasGlasses":
                 while (!("yes".equals(playerInput) || "no".equals(playerInput))){
-                    System.out.println("Please select Yes or No depending if the character has Glasses: ");
+                    System.out.println("Please select 'yes' or 'no' depending if the character has Glasses: ");
                     playerInput = askPlayerForStringInputAndConvertFormat();
                 }
                 return playerInput;
             case "isSmiling":
                 while (!("yes".equals(playerInput) || "no".equals(playerInput))){
-                    System.out.println("Please select Yes or No depending if the character is Smiling: ");
+                    System.out.println("Please select 'yes' or 'no' depending if the character is Smiling: ");
                     playerInput = askPlayerForStringInputAndConvertFormat();
                 }
                 return playerInput;
             case "wearsHat":
                 while (!("yes".equals(playerInput) || "no".equals(playerInput))){
-                    System.out.println("Please select Yes or No depending if the character has a Hat: ");
+                    System.out.println("Please select 'yes' or 'no' depending if the character has a Hat: ");
                     playerInput = askPlayerForStringInputAndConvertFormat();
                 }
                 return playerInput;

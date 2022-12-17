@@ -11,7 +11,7 @@ public class CharacterResource implements ICharacterAttributes, ICharacters {
     private boolean isSmiling;
     private boolean wearsHat;
 
-    private boolean isEliminated = false;
+    private boolean isEliminated;
 
     public CharacterResource(String characterName, String hairColor, String shirtColor,
                              String eyeColor, boolean hasGlasses, boolean isSmiling,
@@ -23,6 +23,7 @@ public class CharacterResource implements ICharacterAttributes, ICharacters {
         this.hasGlasses = hasGlasses;
         this.isSmiling = isSmiling;
         this.wearsHat = wearsHat;
+        this.isEliminated = false;
     }
 
     public CharacterResource(CharacterResource characterResource){
@@ -33,6 +34,7 @@ public class CharacterResource implements ICharacterAttributes, ICharacters {
         this.hasGlasses = characterResource.hasGlasses;
         this.isSmiling = characterResource.isSmiling;
         this.wearsHat = characterResource.wearsHat;
+        this.isEliminated = false;
     }
 
     public CharacterResource(){
@@ -86,8 +88,8 @@ public class CharacterResource implements ICharacterAttributes, ICharacters {
         return false;
     }
 
-    public String isEliminated(){
-        return (isEliminated) ? "YES" : "NO";
+    public boolean getIsEliminated(){
+        return isEliminated;
     }
 
     public void setEliminated(boolean isEliminated){
@@ -96,7 +98,6 @@ public class CharacterResource implements ICharacterAttributes, ICharacters {
 
     public boolean checkHairColor(String hairColor){
         for (String validHairColor : validHairColors) {
-            System.out.println(validHairColor.toLowerCase() + " " + hairColor);
             if (validHairColor.toLowerCase().equals(hairColor)){
                 return true;
             }
@@ -115,7 +116,6 @@ public class CharacterResource implements ICharacterAttributes, ICharacters {
 
     public boolean checkEyeColor(String eyeColor){
         for (String validCEyeColor : validCEyeColors) {
-            System.out.println(validCEyeColor.toLowerCase() + " " + eyeColor);
             if (validCEyeColor.toLowerCase().equals(eyeColor)){
                 return true;
             }
