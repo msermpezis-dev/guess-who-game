@@ -1,6 +1,10 @@
 package org.guesswhogame;
 
-public interface ICharacters {
+/*
+    This interface holds all the available combinations the character attributes can have to create their
+    respected characters
+ */
+public interface IBoardResource {
     CharacterResource[] characters = new CharacterResource[]{
             new CharacterResource("Alice", "Brown", "Black", "Brown",
                     true, true, false),

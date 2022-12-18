@@ -16,7 +16,8 @@ public class PlayerResource {
     }
 
     public void setChosenCharacterByName(String characterName){
-        this.playerChosenCharacter = new CharacterResource(new CharacterResource().getCharacterByName(characterName));
+        this.playerChosenCharacter = new CharacterResource(
+                new CharacterResource().getCharacterByName(characterName));
     }
 
     public CharacterResource getChosenCharacter(){
@@ -37,6 +38,5 @@ public class PlayerResource {
 
     public void setIsPlayerCorrect(boolean isPlayerCorrect){
         this.isPlayerCorrect = isPlayerCorrect;
-
     }
 }

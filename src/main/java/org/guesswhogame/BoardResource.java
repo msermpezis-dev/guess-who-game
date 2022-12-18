@@ -2,23 +2,30 @@ package org.guesswhogame;
 
 import java.util.Scanner;
 
-public class BoardResource implements ICharacters {
-    private CharacterResource[] playerOneBoardCharacters = new CharacterResource[ICharacters.characters.length];
-    private CharacterResource[] playerTwoBoardCharacters = new CharacterResource[ICharacters.characters.length];
+/*
+    The boardResource is responsible for managing all the components and running the game
+ */
+public class BoardResource implements IBoardResource {
+    private CharacterResource[] playerOneBoardCharacters = new CharacterResource[IBoardResource.characters.length];
+    private CharacterResource[] playerTwoBoardCharacters = new CharacterResource[IBoardResource.characters.length];
     private final CharacterResource characterResource = new CharacterResource();
-    private PlayerResource playerOne;
-    private PlayerResource playerTwo;
+    private PlayerResource playerOne = new PlayerResource();
+    private PlayerResource playerTwo = new PlayerResource();
     private int turnCounter = 1;
     private boolean isAnyPlayerCorrect = false;
 
+    // The constructor copies the characters from ICharacters to player one and two's boards
     public BoardResource(){
-        for (int i = 0; i <= ICharacters.characters.length - 1; i++){
-            playerOneBoardCharacters[i] = new CharacterResource(ICharacters.characters[i]);
-            playerTwoBoardCharacters[i] = new CharacterResource(ICharacters.characters[i]);
+        for (int i = 0; i <= IBoardResource.characters.length - 1; i++){
+            playerOneBoardCharacters[i] = new CharacterResource(IBoardResource.characters[i]);
+            playerTwoBoardCharacters[i] = new CharacterResource(IBoardResource.characters[i]);
         }
     }
+
+
+    // startGame method is responsible for the functionality of the game from start to end
     public void startGame(){
-        makePlayersChooseCharacter();
+        askPlayersToChooseACharacter();
         while (!isAnyPlayerCorrect){
             startNewTurn();
             endCurrentPlayerTurn();
@@ -28,10 +35,13 @@ public class BoardResource implements ICharacters {
 
     private void startNewTurn(){
         showPlayerBoard();
+        // characterAttribute is an array of 2 values, that is basically a key/value combination
+        // [0] is the name of the attribute and [1] the value of the attribute
         String[] characterAttribute = askForACharacterAttribute();
         checkCurrentPlayerAndEliminateCharacters(characterAttribute);
     }
 
+    // at the end of every turn, the variable for keeping track of whose turn is, changes accordingly to the last player
     private void endCurrentPlayerTurn(){
         if (playerOne.getIsItThisPlayersTurn()) {
             playerOne.setIsItThisPlayersTurn(false);
@@ -57,17 +67,33 @@ public class BoardResource implements ICharacters {
 
     private void checkCurrentPlayerAndEliminateCharacters(String[] characterAttribute) {
         if (playerOne.getIsItThisPlayersTurn()) {
-            eliminateCharactersWithoutInputAttributes(characterAttribute, playerOneBoardCharacters, playerTwo.getChosenCharacter());
+            eliminateCharacters(characterAttribute, playerOneBoardCharacters, playerTwo.getChosenCharacter());
         }
         else if (playerTwo.getIsItThisPlayersTurn()) {
-            eliminateCharactersWithoutInputAttributes(characterAttribute, playerTwoBoardCharacters, playerOne.getChosenCharacter());
+            eliminateCharacters(characterAttribute, playerTwoBoardCharacters, playerOne.getChosenCharacter());
         }
     }
 
-    private void eliminateCharactersWithoutInputAttributes(String[] characterAttribute,
-                                                           CharacterResource[] playerBoardCharacters,
-                                                           CharacterResource ChosenCharacter){
-        // if questions has positive result
+    // sets the isEliminated variable as true depending on the guess the player has made
+    private void eliminateCharacters(String[] characterAttribute, CharacterResource[] playerBoardCharacters,
+                                     CharacterResource ChosenCharacter){
+
+        // first tries to eliminate characters assuming the guess was correct
+        boolean isGuessCorrect = eliminateForCorrectGuess(characterAttribute, playerBoardCharacters, ChosenCharacter);
+        // if the above assumption was wrong eliminates characters assuming the guess was wrong
+        if (!isGuessCorrect){
+            eliminateForWrongGuess(characterAttribute, playerBoardCharacters, ChosenCharacter);
+            System.out.println("Your guess was WRONG!");
+        } else {
+            System.out.println("Your guess was CORRECT!");
+        }
+    }
+
+    private boolean eliminateForCorrectGuess(String[] characterAttribute, CharacterResource[] playerBoardCharacters,
+                                     CharacterResource ChosenCharacter) {
+        // if the guess was correct, meaning that the player has chosen an attribute that the enemy player's
+        // chosen character has, then eliminates the characters that don't have that attribute
+        // returns true/false to indicate that eliminateForWrongGuess method can be skipped or not
         if ("characterName".equals(characterAttribute[0]) &&
                 ChosenCharacter.getCharacterName().toLowerCase().equals(characterAttribute[1])
         ) {
@@ -75,6 +101,7 @@ public class BoardResource implements ICharacters {
                 if( "characterName".equals(characterAttribute[0]) &&
                         !character.getCharacterName().toLowerCase().equals(characterAttribute[1])){
                     character.setEliminated(true);
+                    return true;
                 }
             }
         } else if ("hairColor".equals(characterAttribute[0]) &&
@@ -84,6 +111,7 @@ public class BoardResource implements ICharacters {
                 if( "hairColor".equals(characterAttribute[0]) &&
                         !character.getHairColor().toLowerCase().equals(characterAttribute[1])){
                     character.setEliminated(true);
+                    return true;
                 }
             }
         } else if ("shirtColor".equals(characterAttribute[0]) &&
@@ -93,6 +121,7 @@ public class BoardResource implements ICharacters {
                 if( "shirtColor".equals(characterAttribute[0]) &&
                         !character.getShirtColor().toLowerCase().equals(characterAttribute[1])){
                     character.setEliminated(true);
+                    return true;
                 }
             }
         } else if ("eyeColor".equals(characterAttribute[0]) &&
@@ -102,6 +131,7 @@ public class BoardResource implements ICharacters {
                 if( "eyeColor".equals(characterAttribute[0]) &&
                         !character.getEyeColor().toLowerCase().equals(characterAttribute[1])){
                     character.setEliminated(true);
+                    return true;
                 }
             }
         } else if ("hasGlasses".equals(characterAttribute[0]) &&
@@ -111,6 +141,7 @@ public class BoardResource implements ICharacters {
                 if( "hasGlasses".equals(characterAttribute[0]) &&
                         !character.doesCharacterHaveGlasses().toLowerCase().equals(characterAttribute[1])){
                     character.setEliminated(true);
+                    return true;
                 }
             }
         } else if ("isSmiling".equals(characterAttribute[0]) &&
@@ -120,6 +151,7 @@ public class BoardResource implements ICharacters {
                 if( "isSmiling".equals(characterAttribute[0]) &&
                         !character.isCharacterSmiling().toLowerCase().equals(characterAttribute[1])){
                     character.setEliminated(true);
+                    return true;
                 }
             }
         } else if ("wearsHat".equals(characterAttribute[0]) &&
@@ -129,11 +161,17 @@ public class BoardResource implements ICharacters {
                 if( "wearsHat".equals(characterAttribute[0]) &&
                         !character.isCharacterWearingAHat().toLowerCase().equals(characterAttribute[1])){
                     character.setEliminated(true);
+                    return true;
                 }
             }
         }
+        return false;
+    }
 
-        // if questions has negative result
+    private void eliminateForWrongGuess(String[] characterAttribute, CharacterResource[] playerBoardCharacters,
+                                     CharacterResource ChosenCharacter) {
+        // if the guess has negative result, meaning that the player has chosen an attribute that the enemy player's
+        // chosen character has, then eliminates the characters that have that attribute
         if ("characterName".equals(characterAttribute[0]) &&
                 !ChosenCharacter.getCharacterName().toLowerCase().equals(characterAttribute[1])
         ) {
@@ -201,7 +239,7 @@ public class BoardResource implements ICharacters {
         }
     }
 
-
+    // checks if the player has guessed correctly its opponent's chosen character
     private void checkCurrentGuess(String characterNameGuess){
         String playerOneCharacterName = playerOne.getChosenCharacter().getCharacterName().toLowerCase();
         String playerTwoCharacterName = playerTwo.getChosenCharacter().getCharacterName().toLowerCase();
@@ -229,11 +267,11 @@ public class BoardResource implements ICharacters {
         }
     }
 
-    private void printCharactersWithTheirAttributes(CharacterResource[] playerCharacters ){
-        System.out.printf("%-10s|\t %-11s| %-13s| %-11s| %-15s| %-15s| %-15s %n", "Name", "Hair Color",
+    private void printCharactersWithTheirAttributes(){
+        System.out.printf("%-10s| %-11s| %-12s| %-10s| %-11s| %-10s| %-10s %n", "Name", "Hair Color",
                 "Shirt Color", "Eye Color", "hasGlasses", "isSmiling", "wearsHat");
-        System.out.println("------------------------------------------------------------------------------------------------");
-        for ( CharacterResource character : playerCharacters ){
+        System.out.println("------------------------------------------------------------------------------------");
+        for ( CharacterResource character : IBoardResource.characters ){
             String characterName = character.getCharacterName();
             String hairColor = character.getHairColor();
             String shirtColor = character.getShirtColor();
@@ -241,16 +279,16 @@ public class BoardResource implements ICharacters {
             String hasGlasses = character.doesCharacterHaveGlasses();
             String isSmiling = character.isCharacterSmiling();
             String wearsHat =  character.isCharacterWearingAHat();
-            String characterDescription = "%-10s|\t %-11s| %-13s| %-11s| %-15s| %-15s| %-15s %n";
+            String characterDescription = "%-10s| %-11s| %-12s| %-10s| %-11s| %-10s| %-10s %n";
             System.out.printf(characterDescription, characterName, hairColor, shirtColor, eyeColor, hasGlasses,
                     isSmiling, wearsHat);
         }
     }
 
     private void printRemainingCharacters(CharacterResource[] playerCharacters ){
-        System.out.printf("%-10s|\t %-11s| %-13s| %-11s| %-15s| %-15s| %-15s %n", "Name", "Hair Color",
+        System.out.printf("%-10s| %-11s| %-12s| %-10s| %-11s| %-10s| %-10s %n", "Name", "Hair Color",
                 "Shirt Color", "Eye Color", "hasGlasses", "isSmiling", "wearsHat");
-        System.out.println("------------------------------------------------------------------------------------------------");
+        System.out.println("------------------------------------------------------------------------------------");
         for ( CharacterResource character : playerCharacters ){
             String characterName = character.getCharacterName();
             String hairColor = character.getHairColor();
@@ -259,7 +297,7 @@ public class BoardResource implements ICharacters {
             String hasGlasses = character.doesCharacterHaveGlasses();
             String isSmiling = character.isCharacterSmiling();
             String wearsHat =  character.isCharacterWearingAHat();
-            String characterDescription = "%-10s|\t %-11s| %-13s| %-11s| %-15s| %-15s| %-15s %n";
+            String characterDescription = "%-10s| %-11s| %-12s| %-10s| %-11s| %-10s| %-10s %n";
             if (!character.getIsEliminated()){
                 System.out.printf(characterDescription, characterName, hairColor, shirtColor, eyeColor, hasGlasses,
                         isSmiling, wearsHat);
@@ -267,11 +305,10 @@ public class BoardResource implements ICharacters {
         }
     }
 
-    private void makePlayersChooseCharacter(){
-        playerOne = new PlayerResource();
-        playerTwo = new PlayerResource();
+    // creates a loop the ends only when the 2 players have selected a character as their chosen character
+    private void askPlayersToChooseACharacter(){
         System.out.println("Board with all available characters.");
-        printCharactersWithTheirAttributes(ICharacters.characters);
+        printCharactersWithTheirAttributes();
         while (playerOne.getChosenCharacter() == null || playerTwo.getChosenCharacter() == null){
 
             if (!playerOne.getIsItThisPlayersTurn()){
@@ -288,7 +325,7 @@ public class BoardResource implements ICharacters {
                 playerOne.setChosenCharacterByName(playerChosenCharacterName);
                 System.out.println("\n\n\n\n");
                 System.out.println("Board with all available characters.");
-                printCharactersWithTheirAttributes(ICharacters.characters);
+                printCharactersWithTheirAttributes();
             } else if (isChosenCharacterNameValid && !playerTwo.getIsItThisPlayersTurn()){
                 playerTwo.setChosenCharacterByName(playerChosenCharacterName);
             }
@@ -305,15 +342,15 @@ public class BoardResource implements ICharacters {
         return playerInput;
     }
 
-    private int askPlayerForNumberInput(){
+    private int askPlayerForChoiceInput(){
         Scanner scanner = new Scanner(System.in);
-        String input = scanner.nextLine();
-        while ( !checkIfStringIsValid(input) ){
-            input = scanner.nextLine();
+        String input = scanner.nextLine().replaceAll("\\s", "");
+        while ( !checkIfChoiceIsValid(input) ){
+            input = scanner.nextLine().replaceAll("\\s", "");;
         }
         return Integer.parseInt(input);
     }
-    private boolean checkIfStringIsValid(String selectionNumber){
+    private boolean checkIfChoiceIsValid(String selectionNumber){
         // valid options are number 1-7
         switch (selectionNumber){
             case "1":
@@ -330,6 +367,7 @@ public class BoardResource implements ICharacters {
         }
     }
 
+    // ask player for the characterAttributeName and characterAttributeValue for their turn's guess
     private String[] askForACharacterAttribute(){
         String characterAttributeName = askCharacterAttributeName();
         String characterAttributeValue = askCharacterAttributeValue(characterAttributeName);
@@ -338,15 +376,15 @@ public class BoardResource implements ICharacters {
 
     private String askCharacterAttributeName(){
         int playerNumberInput;
-        System.out.println("\nPlease pick the number that corresponds to the attribute name from the list below:");
+        System.out.println("\nPlease pick the NUMBER that corresponds to the attribute name from the list below:");
         System.out.println("1. Name \t2. Hair Color \t3. T-shirt Color \t4. Eye Color" +
                 "\t5. Glasses \t6. Smile \t 7. Hat");
-        playerNumberInput = askPlayerForNumberInput();
+        playerNumberInput = askPlayerForChoiceInput();
 
-        return convertInputToAttributeName(playerNumberInput);
+        return convertChoiceToAttributeName(playerNumberInput);
     }
 
-    private String convertInputToAttributeName(int playerNumberInput){
+    private String convertChoiceToAttributeName(int playerNumberInput){
         switch (playerNumberInput){
             case 1:
                 return "characterName";
@@ -367,6 +405,7 @@ public class BoardResource implements ICharacters {
         }
     }
 
+    // asks player for an attribute value based on the player's choice
     private String askCharacterAttributeValue(String characterAttributeName){
         String playerInput = "";
         switch (characterAttributeName) {

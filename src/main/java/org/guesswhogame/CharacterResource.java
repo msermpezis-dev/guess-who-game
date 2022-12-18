@@ -1,6 +1,6 @@
 package org.guesswhogame;
 
-public class CharacterResource implements ICharacterAttributes, ICharacters {
+public class CharacterResource implements ICharacterResource {
     private String characterName;
     private String hairColor;
     private String shirtColor;
@@ -66,17 +66,15 @@ public class CharacterResource implements ICharacterAttributes, ICharacters {
         return (wearsHat) ? "yes" : "no";
     }
 
-    public CharacterResource getCharacterByName(String characterName){
-        for ( CharacterResource character : ICharacters.characters){
-            if (character.characterName.toLowerCase().equals(characterName)){
-
-                return character;
-            }
-        }
-        // returns null if character doesn't exist
-        return null;
+    public boolean getIsEliminated(){
+        return isEliminated;
     }
 
+    public void setEliminated(boolean isEliminated){
+        this.isEliminated = isEliminated;
+    }
+
+    // returns true/false depending on whether the specific name exists the validCharacterNames string array
     public boolean checkName(String characterName){
         for (String validCharacterName : validCharacterNames) {
             if (validCharacterName.toLowerCase().equals(characterName)){
@@ -86,14 +84,19 @@ public class CharacterResource implements ICharacterAttributes, ICharacters {
         return false;
     }
 
-    public boolean getIsEliminated(){
-        return isEliminated;
+    // returns the character object for a specified character name
+    public CharacterResource getCharacterByName(String characterName){
+        for ( CharacterResource character : IBoardResource.characters){
+            if (character.characterName.toLowerCase().equals(characterName)){
+
+                return character;
+            }
+        }
+        // returns null if character doesn't exist
+        return null;
     }
 
-    public void setEliminated(boolean isEliminated){
-        this.isEliminated = isEliminated;
-    }
-
+    // returns true/false depending on whether the specific name exists the validHairColors string array
     public boolean checkHairColor(String hairColor){
         for (String validHairColor : validHairColors) {
             if (validHairColor.toLowerCase().equals(hairColor)){
@@ -103,6 +106,7 @@ public class CharacterResource implements ICharacterAttributes, ICharacters {
         return false;
     }
 
+    // returns true/false depending on whether the specific name exists the validShirtColors string array
     public boolean checkShirtColor(String shirtColor){
         for (String validShirtColor : validShirtColors) {
             if (validShirtColor.toLowerCase().equals(shirtColor)){
@@ -112,6 +116,7 @@ public class CharacterResource implements ICharacterAttributes, ICharacters {
         return false;
     }
 
+    // returns true/false depending on whether the specific name exists the validCEyeColors string array
     public boolean checkEyeColor(String eyeColor){
         for (String validCEyeColor : validCEyeColors) {
             if (validCEyeColor.toLowerCase().equals(eyeColor)){
